@@ -3,24 +3,12 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <!-- <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header> -->
-<!-- 
-  <RouterView /> -->
-  <div id="layout">
+  <div id="app">
     <header>
       <div class="wrapper">
         <nav>
-          <RouterLink to="/">Event</RouterLink>
-          <RouterLink to="/about">About</RouterLink>
+          <RouterLink :to="{ name: 'event-list-view' }">Event</RouterLink> |
+          <RouterLink :to="{ name: 'about' }">About</RouterLink>
         </nav>
       </div>
     </header>
@@ -28,8 +16,6 @@ import { RouterLink, RouterView } from 'vue-router'
     <RouterView />
   </div>
 </template>
-
-
 <style>
 #layout {
   font-family: Avenir, Arial, Helvetica, sans-serif;

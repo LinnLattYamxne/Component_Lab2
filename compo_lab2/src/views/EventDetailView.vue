@@ -4,8 +4,15 @@ import { type Event } from '@/types'
 import EventService from '@/services/EventService'
 
 const event = ref<Event | null>(null)
+const props = defineProps({
+  id: {
+    type: String,
+    required: true
+  }
+})
+
 onMounted(() => {
-  EventService.getEvent(id.value)
+  EventService.getEvent(Number(props.id))
     .then((response) => {
       event.value = response.data
     })
