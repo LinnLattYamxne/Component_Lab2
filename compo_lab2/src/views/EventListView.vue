@@ -1,20 +1,41 @@
 <script setup lang="ts">
 import EventCard from '@/components/EventCard.vue'
-import EventInfo from '@/components/EventInfo.vue'
+// import EventInfo from '@/components/EventInfo.vue'
 import type { Event } from '@/types'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watchEffect } from 'vue'
 import EventService from '@/services/EventService.ts'
 
 const events = ref<Event[] | null>(null)
+const totalEvents = ref<number>(0)
+  const hasNextPage = computed(() => {
+    const totalPages = Math.ceil(totalEvents.value / size.value)
+    return page.value < totalPages
+  })
+const props = defineProps({
+  page: {
+    type: Number,
+    required: true
+  },
+  size: {
+    type: Number,
+    default: 2
+  }
+})
+const page = computed(() => props.page)
+const size = computed(() => props.size)
 
 onMounted(() => {
-  EventService.getEvents ()
-  .then((response) => {
-      events.value = response.data
-    })
-    .catch((error) => {
-      console.error('There was an error!', error)
-    })
+  watchEffect(() => {
+    events.value = null
+    EventService.getEvents(size.value, page.value)
+      .then((response) => {
+        events.value = response.data
+        totalEvents.value = response.headers['x-total-count']
+      })
+      .catch((error) => {
+        console.error('There was an error!', error)
+      })
+  })
 })
 </script>
 
@@ -22,9 +43,40 @@ onMounted(() => {
   <h1>Events for Good</h1>
 
   <div class="events">
-    <div v-for="event in events" :key="event.id" class="event-wrapper">
-      <EventCard :event="event" />
-      <EventInfo :event="event" />
+    <EventCard v-for="event in events" :key="event.id" :event="event" />
+
+    <div class="pagination">
+      <RouterLink
+        id="page-prev"
+        :to="{ name: 'event-list-view', query: { page: page - 1, size: size } }"
+        rel="prev"
+        v-if="page != 1"
+      >&#60; Prev Page</RouterLink>
+
+      <RouterLink
+        id="page-next"
+        :to="{ name: 'event-list-view', query: { page: page + 1, size: size } }"
+        rel="next"
+        v-if="hasNextPage"
+      >Next Page &#62;</RouterLink>
+    </div>
+
+    <div class="size-selector">
+      <span>Show per page: </span>
+      <RouterLink 
+        :class="{ active: size === 2 }" 
+        :to="{ name: 'event-list-view', query: { page: 1, size: 2 } }"
+      >2</RouterLink>
+      <span class="divider">|</span>
+      <RouterLink 
+        :class="{ active: size === 4 }" 
+        :to="{ name: 'event-list-view', query: { page: 1, size: 4 } }"
+      >4</RouterLink>
+      <span class="divider">|</span>
+      <RouterLink 
+        :class="{ active: size === 6 }" 
+        :to="{ name: 'event-list-view', query: { page: 1, size: 6 } }"
+      >6</RouterLink>
     </div>
   </div>
 </template>
@@ -37,7 +89,39 @@ onMounted(() => {
     }
 
     .event-wrapper {
-    margin-bottom: 24px; 
-  }
+      margin-bottom: 24px; 
+    }
+
+    .pagination {
+      display: flex;
+      width: 290px;
+    }
+
+    .pagination a {
+      flex: 1;
+      text-decoration: none;
+      color: #2c3e50;
+    }
+
+    .pagination-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 60px;            
+      margin-top: 32px;     
+      margin-bottom: 50px;  
+    }
+
+    .size-selector {
+      margin-top: 20px;
+    }
+
+    #page-prev {
+      text-align: left;
+    }
+
+    #page-next {
+      text-align: right;
+    }
   </style>
 
