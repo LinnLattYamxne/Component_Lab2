@@ -10,10 +10,11 @@ const router = useRouter()
 
 const events = ref<Event[] | null>(null)
 const totalEvents = ref<number>(0)
-  const hasNextPage = computed(() => {
-    const totalPages = Math.ceil(totalEvents.value / 3)
-    return page.value < totalPages
-  })
+const hasNextPage = computed(() => {
+  const totalPages = Math.ceil(totalEvents.value / 3)
+  return page.value < totalPages
+})
+
 const props = defineProps({
   page: {
     type: Number,
@@ -24,6 +25,7 @@ const props = defineProps({
     default: 2
   }
 })
+
 const page = computed(() => props.page)
 const size = computed(() => props.size)
 
@@ -47,9 +49,11 @@ onMounted(() => {
   <div class="flex flex-col items-center">
     <EventCard v-for="event in events" :key="event.id" :event="event" />
 
-    <div class="pagination">
+    <!-- Pagination links -->
+    <div class="flex w-[290px]">
       <RouterLink
         id="page-prev"
+        class="flex-1 text-left no-underline text-gray-700"
         :to="{ name: 'event-list-view', query: { page: page - 1, size: size } }"
         rel="prev"
         v-if="page != 1"
@@ -57,67 +61,30 @@ onMounted(() => {
 
       <RouterLink
         id="page-next"
+        class="flex-1 text-right no-underline text-gray-700"
         :to="{ name: 'event-list-view', query: { page: page + 1, size: size } }"
         rel="next"
         v-if="hasNextPage"
       >Next Page &#62;</RouterLink>
     </div>
 
-    <div class="size-selector">
+    <!-- Size selector -->
+    <div class="mt-5">
       <span>Show per page: </span>
       <RouterLink 
-        :class="{ active: size === 2 }" 
+        :class="{ 'font-bold text-green-500': size === 2, 'text-gray-700': size !== 2 }" 
         :to="{ name: 'event-list-view', query: { page: 1, size: 2 } }"
       >2</RouterLink>
-      <span class="divider">|</span>
+      <span class="mx-1">|</span>
       <RouterLink 
-        :class="{ active: size === 4 }" 
+        :class="{ 'font-bold text-green-500': size === 4, 'text-gray-700': size !== 4 }" 
         :to="{ name: 'event-list-view', query: { page: 1, size: 4 } }"
       >4</RouterLink>
-      <span class="divider">|</span>
+      <span class="mx-1">|</span>
       <RouterLink 
-        :class="{ active: size === 6 }" 
+        :class="{ 'font-bold text-green-500': size === 6, 'text-gray-700': size !== 6 }" 
         :to="{ name: 'event-list-view', query: { page: 1, size: 6 } }"
       >6</RouterLink>
     </div>
   </div>
 </template>
-
-  <style scoped>
-    .event-wrapper {
-      margin-bottom: 24px; 
-    }
-
-    .pagination {
-      display: flex;
-      width: 290px;
-    }
-
-    .pagination a {
-      flex: 1;
-      text-decoration: none;
-      color: #2c3e50;
-    }
-
-    .pagination-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 60px;            
-      margin-top: 32px;     
-      margin-bottom: 50px;  
-    }
-
-    .size-selector {
-      margin-top: 20px;
-    }
-
-    #page-prev {
-      text-align: left;
-    }
-
-    #page-next {
-      text-align: right;
-    }
-  </style>
-
