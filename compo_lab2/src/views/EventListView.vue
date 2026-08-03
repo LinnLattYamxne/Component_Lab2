@@ -4,6 +4,9 @@ import EventCard from '@/components/EventCard.vue'
 import type { Event } from '@/types'
 import { ref, onMounted, computed, watchEffect } from 'vue'
 import EventService from '@/services/EventService.ts'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const events = ref<Event[] | null>(null)
 const totalEvents = ref<number>(0)
@@ -25,6 +28,7 @@ const page = computed(() => props.page)
 const size = computed(() => props.size)
 
 onMounted(() => {
+  events.value = null
   watchEffect(() => {
     events.value = null
     EventService.getEvents(size.value, page.value)
@@ -32,8 +36,8 @@ onMounted(() => {
         events.value = response.data
         totalEvents.value = response.headers['x-total-count']
       })
-      .catch((error) => {
-        console.error('There was an error!', error)
+      .catch(() => {
+        router.push({ name: 'network-error-view' })
       })
   })
 })
