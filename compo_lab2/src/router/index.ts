@@ -33,7 +33,6 @@ const router = createRouter({
         const eventStore = useEventStore()
         return EventService.getEvent(id)
           .then((response) => {
-            // need to setup the data for the event
             eventStore.setEvent(response.data)
           })
           .catch((error) => {
